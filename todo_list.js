@@ -1,0 +1,67 @@
+function addTask(description, dueTime) {
+    const list = document.createElement("li");
+    list.innerText = description;
+  
+    if (dueTime) {
+      const span = document.createElement("span");
+      span.classList.add("due");
+      const date = new Date(dueTime);
+      span.innerText =
+        "due " + date.toLocaleDateString() + " " + date.toLocaleTimeString();
+      list.append(span);
+    }
+  
+    const button = document.createElement("button");
+    button.setAttribute("class", "btn btn-sm btn-outline-danger done");
+    button.setAttribute("type", "button");
+    button.innerText = "Done";
+    // part 6: if clicked on done, then remove
+    button.addEventListener("click", () => {
+      list.remove();
+    });
+    list.append(button);
+  
+    const ul = document.querySelector("ul#task_list");
+    ul.append(list);
+  }
+
+
+function dateAndTimeToTimestamp(dateInputElement, timeInputElement) {
+    const dueDate = dateInputElement.valueAsNumber; // Returns the timestamp at midnight for the given date
+    const dueTime = timeInputElement.valueAsNumber; // Returns the number of milliseconds from midnight to the time
+
+    if(dueDate && dueTime) { // The user specified both a due date & due time
+        //Add the timezone offset to account for the fact that timestamps are specified by UTC
+        const timezoneOffset =  (new Date()).getTimezoneOffset() * 60 * 1000;
+        return dueDate + dueTime + timezoneOffset;
+    } else {
+        // if the user did not specify both a due date and due time, return false
+        return false;
+    }
+}
+
+// add to-do
+function listAllTask() {
+    const description_input = document.querySelector("input#task_description_input");
+    const dueDate_input = document.querySelector("input#duedate_input");
+    const dueTime_input = document.querySelector('input#duetime_input');
+
+    const dueTime = dateAndTimeToTimestamp(dueDate_input, dueTime_input);
+    addTask(description_input.value, dueTime);
+    description_input.value = ""
+};
+
+
+// add eventlistener to the add_task button
+const clickOnBtn = document.getElementById("add_task")
+clickOnBtn.addEventListener('click', () => {
+    listAllTask()
+});
+
+// create keyboard shortcut
+const enter = document.querySelector("input#task_description_input");
+enter.addEventListener("keydown", (event) => {
+    if (event.isComposing || event.keyCode === 13) {
+        listAllTask()
+    }
+});
